@@ -112,9 +112,9 @@ def grid_loc():
     return board[loc[0] // SQUARE_WIDTH][loc[1] // SQUARE_HEIGHT]
 
 
-# rook moves
+# rook / queen moves
 def rook_moves(square, opposite_color, moves):
-    if square.piece == 'rook':
+    if square.piece == 'rook' or square.piece == 'queen':
         # right
         for i in range(square.x + 1, 7):
             if not board[i][square.y].status:
@@ -152,6 +152,129 @@ def rook_moves(square, opposite_color, moves):
                 break
 
 
+# knight moves
+def knight_moves(square, color, moves):
+    if square.piece == 'knight':
+        # top right
+        if square.x + 1 <= 7 and square.y - 2 >= 0 and not board[square.x + 1][square.y - 2].status == color:
+            moves.append(board[square.x + 1][square.y - 2])
+
+        # right top
+        if square.x + 2 <= 7 and square.y - 1 >= 0 and not board[square.x + 2][square.y - 1].status == color:
+            moves.append(board[square.x + 2][square.y - 1])
+
+        # right bottom
+        if square.x + 2 <= 7 and square.y + 1 <= 7 and not board[square.x + 2][square.y + 1].status == color:
+            moves.append(board[square.x + 2][square.y + 1])
+
+        # bottom right
+        if square.x + 1 <= 7 and square.y + 2 <= 7 and not board[square.x + 1][square.y + 2].status == color:
+            moves.append(board[square.x + 1][square.y + 2])
+
+        # bottom left
+        if square.x - 1 >= 0 and square.y + 2 <= 7 and not board[square.x - 1][square.y + 2].status == color:
+            moves.append(board[square.x - 1][square.y + 2])
+
+        # left bottom
+        if square.x - 2 >= 0 and square.y + 1 <= 7 and not board[square.x - 2][square.y + 1].status == color:
+            moves.append(board[square.x - 2][square.y + 1])
+
+        # left top
+        if square.x - 2 >= 0 and square.y - 1 >= 0 and not board[square.x - 2][square.y - 1].status == color:
+            moves.append(board[square.x - 2][square.y - 1])
+
+        # top left
+        if square.x - 1 >= 0 and square.y - 2 >= 0 and not board[square.x - 1][square.y - 2].status == color:
+            moves.append(board[square.x - 1][square.y - 2])
+
+
+# bishop / queen moves
+def bishop_moves(square, opposite_color, moves):
+    if square.piece == 'bishop' or square.piece == 'queen':
+        # top right
+        i = 1
+        while square.x + i < 8 and square.y - i >= 0:
+            loc = board[square.x + i][square.y - i]
+            if loc.status:
+                if loc.status == opposite_color:
+                    moves.append(loc)
+                break
+            moves.append(loc)
+            i += 1
+
+        # bottom right
+        i = 1
+        while square.x + i < 8 and square.y + i < 8:
+            loc = board[square.x + i][square.y + i]
+            if loc.status:
+                if loc.status == opposite_color:
+                    moves.append(loc)
+                break
+            moves.append(loc)
+            i += 1
+
+        # bottom left
+        i = 1
+        while square.x - i >= 0 and square.y + i < 8:
+            loc = board[square.x - i][square.y + i]
+            if loc.status:
+                if loc.status == opposite_color:
+                    moves.append(loc)
+                break
+            moves.append(loc)
+            i += 1
+
+        # top left
+        i = 1
+        while square.x - i >= 0 and square.y - i >= 0:
+            loc = board[square.x - i][square.y - i]
+            if loc.status:
+                if loc.status == opposite_color:
+                    moves.append(loc)
+                break
+            moves.append(loc)
+            i += 1
+
+
+# king moves
+def king_moves(square, color, moves):
+    if square.piece == 'king':
+        # up
+        if square.y - 1 >= 0:
+            # direct
+            if board[square.x][square.y - 1].status != color:
+                moves.append(board[square.x][square.y - 1])
+
+            # left
+            if square.x - 1 >= 0 and board[square.x - 1][square.y - 1].status != color:
+                moves.append(board[square.x - 1][square.y - 1])
+
+            # right
+            if square.x + 1 < 8 and board[square.x + 1][square.y - 1].status != color:
+                moves.append(board[square.x + 1][square.y - 1])
+
+        # left
+        if square.x - 1 >= 0 and board[square.x - 1][square.y].status != color:
+            moves.append(board[square.x - 1][square.y])
+
+        # right
+        if square.x + 1 < 8 and board[square.x + 1][square.y].status != color:
+            moves.append(board[square.x + 1][square.y])
+
+        # down
+        if square.y + 1 < 8:
+            # direct
+            if board[square.x][square.y + 1].status != color:
+                moves.append(board[square.x][square.y + 1])
+
+            # left
+            if square.x - 1 >= 0 and board[square.x - 1][square.y + 1].status != color:
+                moves.append(board[square.x - 1][square.y + 1])
+
+            # right
+            if square.x + 1 < 8 and board[square.x + 1][square.y + 1].status != color:
+                moves.append(board[square.x + 1][square.y + 1])
+
 
 # checking legal moves for a certain piece
 def legal_moves(square):
@@ -173,11 +296,17 @@ def legal_moves(square):
             if square.x > 0 and board[square.x - 1][square.y - 1].status == 'black':
                 moves.append(board[square.x - 1][square.y - 1])
 
-        # rook
+        # rook / queen
         rook_moves(square, 'black', moves)
 
         # knight
         knight_moves(square, 'white', moves)
+
+        # bishop / queen
+        bishop_moves(square, 'black', moves)
+
+        # king
+        king_moves(square, 'white', moves)
 
     # black pieces
     if square.status == 'black':
@@ -198,6 +327,15 @@ def legal_moves(square):
 
         # rook
         rook_moves(square, 'white', moves)
+
+        # knight
+        knight_moves(square, 'black', moves)
+
+        # bishop
+        bishop_moves(square, 'white', moves)
+
+        # king
+        king_moves(square, 'black', moves)
 
     return moves
 
