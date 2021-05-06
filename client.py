@@ -15,32 +15,32 @@ SQUARE_WIDTH, SQUARE_HEIGHT, SQUARE_NUM = 100, 100, 8
 black_king = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'black_king.png')),
                                     (SQUARE_WIDTH, SQUARE_HEIGHT))
 black_queen = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'black_queen.png')),
-                                    (SQUARE_WIDTH, SQUARE_HEIGHT))
+                                     (SQUARE_WIDTH, SQUARE_HEIGHT))
 black_rook = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'black_rook.png')),
                                     (SQUARE_WIDTH, SQUARE_HEIGHT))
 black_bishop = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'black_bishop.png')),
-                                    (SQUARE_WIDTH, SQUARE_HEIGHT))
+                                      (SQUARE_WIDTH, SQUARE_HEIGHT))
 black_knight = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'black_knight.png')),
-                                    (SQUARE_WIDTH, SQUARE_HEIGHT))
+                                      (SQUARE_WIDTH, SQUARE_HEIGHT))
 black_pawn = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'black_pawn.png')),
                                     (SQUARE_WIDTH, SQUARE_HEIGHT))
 white_king = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'white_king.png')),
                                     (SQUARE_WIDTH, SQUARE_HEIGHT))
 white_queen = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'white_queen.png')),
-                                    (SQUARE_WIDTH, SQUARE_HEIGHT))
+                                     (SQUARE_WIDTH, SQUARE_HEIGHT))
 white_rook = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'white_rook.png')),
                                     (SQUARE_WIDTH, SQUARE_HEIGHT))
 white_bishop = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'white_bishop.png')),
-                                    (SQUARE_WIDTH, SQUARE_HEIGHT))
+                                      (SQUARE_WIDTH, SQUARE_HEIGHT))
 white_knight = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'white_knight.png')),
-                                    (SQUARE_WIDTH, SQUARE_HEIGHT))
+                                      (SQUARE_WIDTH, SQUARE_HEIGHT))
 white_pawn = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'white_pawn.png')),
                                     (SQUARE_WIDTH, SQUARE_HEIGHT))
 
 # Colors
 WHITE = (255, 255, 255)
-LIGHT_BROWN = (222,184,135)
-DARK_BROWN = (160,82,45)
+LIGHT_BROWN = (222, 184, 135)
+DARK_BROWN = (160, 82, 45)
 BLACK = (0, 0, 0)
 
 # board
@@ -112,6 +112,47 @@ def grid_loc():
     return board[loc[0] // SQUARE_WIDTH][loc[1] // SQUARE_HEIGHT]
 
 
+# rook moves
+def rook_moves(square, opposite_color, moves):
+    if square.piece == 'rook':
+        # right
+        for i in range(square.x + 1, 7):
+            if not board[i][square.y].status:
+                moves.append(board[i][square.y])
+            else:
+                if board[i][square.y].status == opposite_color:
+                    moves.append(board[i][square.y])
+                break
+
+        # left
+        for i in range(square.x - 1, -1, -1):
+            if not board[i][square.y].status:
+                moves.append(board[i][square.y])
+            else:
+                if board[i][square.y].status == opposite_color:
+                    moves.append(board[i][square.y])
+                break
+
+        # up
+        for i in range(square.y - 1, -1, -1):
+            if not board[square.x][i].status:
+                moves.append(board[square.x][i])
+            else:
+                if board[square.x][i].status == opposite_color:
+                    moves.append(board[square.x][i])
+                break
+
+        # down
+        for i in range(square.y + 1, 7):
+            if not board[square.x][i].status:
+                moves.append(board[square.x][i])
+            else:
+                if board[square.x][i].status == opposite_color:
+                    moves.append(board[square.x][i])
+                break
+
+
+
 # checking legal moves for a certain piece
 def legal_moves(square):
     moves = []
@@ -122,15 +163,21 @@ def legal_moves(square):
         if square.piece == 'pawn':
             # if front is empty
             if not board[square.x][square.y - 1].status:
-                moves.append((square.x, square.y - 1))
+                moves.append(board[square.x][square.y - 1])
                 if not board[square.x][square.y - 2].status and square.y == 6:
-                    moves.append((square.x, square.y - 2))
+                    moves.append(board[square.x][square.y - 2])
 
             # if diagonal is possible
-            if board[square.x + 1][square.y - 1].status == 'black':
-                moves.append((square.x + 1, square.y - 1))
-            if board[square.x - 1][square.y - 1].status == 'black':
-                moves.append((square.x - 1, square.y - 1))
+            if square.x < 7 and board[square.x + 1][square.y - 1].status == 'black':
+                moves.append(board[square.x + 1][square.y - 1])
+            if square.x > 0 and board[square.x - 1][square.y - 1].status == 'black':
+                moves.append(board[square.x - 1][square.y - 1])
+
+        # rook
+        rook_moves(square, 'black', moves)
+
+        # knight
+        knight_moves(square, 'white', moves)
 
     # black pieces
     if square.status == 'black':
@@ -138,16 +185,19 @@ def legal_moves(square):
         if square.piece == 'pawn':
             # if front is empty
             if not board[square.x][square.y + 1].status:
-                moves.append((square.x, square.y + 1))
+                moves.append(board[square.x][square.y + 1])
                 # if have not moved
                 if not board[square.x][square.y + 2].status and square.y == 1:
-                    moves.append((square.x, square.y + 2))
+                    moves.append(board[square.x][square.y + 2])
 
             # if diagonal is possible
-            if board[square.x + 1][square.y + 1].status == 'white':
-                moves.append((square.x + 1, square.y + 1))
-            if board[square.x - 1][square.y + 1].status == 'white':
-                moves.append((square.x - 1, square.y + 1))
+            if square.x < 7 and board[square.x + 1][square.y + 1].status == 'white':
+                moves.append(board[square.x + 1][square.y + 1])
+            if square.x > 0 and board[square.x - 1][square.y + 1].status == 'white':
+                moves.append(board[square.x - 1][square.y + 1])
+
+        # rook
+        rook_moves(square, 'white', moves)
 
     return moves
 
@@ -159,6 +209,7 @@ def chess():
     run = True
     turn = 'white'
     moving_square = None
+    legal = []
     while run:
         # events
         for event in pygame.event.get():
@@ -168,32 +219,17 @@ def chess():
 
             # moving pieces
             if event.type == pygame.MOUSEBUTTONDOWN:
-                # if first click
-                if not moving_square:
-                    moving_square = grid_loc()
-                    # checking if turn is correct
-                    if not moving_square.status or moving_square.status != turn:
-                        moving_square = None
+                # grab square that was clicked
+                clicked_square = grid_loc()
 
-                # if second click
-                else:
-                    landing_square = grid_loc()
-                    legal = legal_moves(moving_square)
-                    print(legal)
-
-                    # if clicked on a square with something on it
-                    if landing_square.status == moving_square.status:
-                        moving_square = grid_loc()
-                        # checking if turn is correct
-                        if not moving_square.status or moving_square.status != turn:
-                            moving_square = None
-
-                    # if different square clicked
-                    elif landing_square != moving_square and (landing_square.x, landing_square.y) in legal:
-                        # making a move
-                        landing_square.status = moving_square.status
-                        landing_square.piece = moving_square.piece
-                        landing_square.image = moving_square.image
+                # if there are legal moves saved, remove them
+                if len(legal) != 0:
+                    # if clicked square is in legal
+                    if clicked_square in legal and moving_square:
+                        # make move
+                        clicked_square.status = moving_square.status
+                        clicked_square.piece = moving_square.piece
+                        clicked_square.image = moving_square.image
                         moving_square.status = None
                         moving_square.piece = None
                         moving_square.image = None
@@ -204,6 +240,18 @@ def chess():
                             turn = 'black'
                         else:
                             turn = 'white'
+
+                    # clear legal
+                    for square in legal:
+                        square.legal = False
+
+                # grab legal moves and redraw the board accordingly
+                if clicked_square.status == turn:
+                    moving_square = clicked_square
+                    legal = legal_moves(clicked_square)
+                    for square in legal:
+                        square.legal = True
+                    draw_board()
 
         # drawing the board
         draw_board()
