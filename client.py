@@ -1,7 +1,7 @@
 from classes import Square
+from classes import Network
 import pygame
 import os
-from PIL import Image
 
 # Display setup
 WIDTH = 800

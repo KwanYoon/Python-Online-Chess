@@ -1,5 +1,6 @@
 import pygame
 import os
+import socket
 
 # image imports
 SQUARE_WIDTH, SQUARE_HEIGHT = 100, 100
@@ -23,3 +24,40 @@ class Square():
             win.blit(self.image, (self.x * width, self.y * height))
         if self.legal:
             win.blit(legal_symbol, (self.x * width, self.y * height))
+
+
+# network class
+class Network():
+    def __init__(self):
+        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server = "192.168.2.197"
+        self.port = 5555
+        self.addr = (self.server, self.port)
+        self.board = self.connect()
+        print(self.board)
+
+    def get_board(self):
+        return self.board
+
+    def connect(self):
+        try:
+            # connect to addr
+            self.client.connect(self.addr)
+            # return what we receive and decode it
+            return self.client.recv(2048).decode()
+        except:
+            pass
+
+    # for sending to the server
+    def send(self, board):
+        try:
+            # send to the address
+            self.client.send(str.encode(board))
+            # return what we receive after ending
+            return self.client.recv(2048).decode()
+        except socket.error as e:
+            print(e)
+
+n = Network()
+print(n.send("information"))
+print(n.send("information2"))
