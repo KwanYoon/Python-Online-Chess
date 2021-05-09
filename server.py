@@ -2,7 +2,7 @@ import socket
 from _thread import *
 
 # server settings
-server = "192.168.2.197"
+server = socket.gethostbyname(socket.gethostname())
 port = 5555
 
 # socket settings
@@ -18,7 +18,6 @@ except socket.error as e:
 s.listen(2)
 print("Waiting for connection, server started")
 current_player = 0
-board = []
 
 
 # threaded client function

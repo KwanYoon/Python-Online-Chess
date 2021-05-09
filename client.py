@@ -112,6 +112,17 @@ def grid_loc():
     return board[loc[0] // SQUARE_WIDTH][loc[1] // SQUARE_HEIGHT]
 
 
+# creating string format move with given integer inputs
+def make_str_move(move_x, move_y, land_x, land_y):
+    return str(move_x) + "," + str(move_y) + "," + str(land_x) + "," + str(land_y)
+
+
+# creating integer format move with given string input
+def make_int_move(move_str):
+    move_str = move_str.split(",")
+    return int(move_str[0]), int(move_str[1]), int(move_str[2]), int(move_str[3])
+
+
 # rook / queen moves
 def rook_moves(square, opposite_color, moves):
     if square.piece == 'rook' or square.piece == 'queen':
@@ -342,6 +353,9 @@ def legal_moves(square):
 
 # main chess function
 def chess():
+    # networking
+    n = Network()
+
     # updating the board
     clock = pygame.time.Clock()
     run = True
@@ -389,7 +403,8 @@ def chess():
                     legal = legal_moves(clicked_square)
                     for square in legal:
                         square.legal = True
-                    draw_board()
+
+        # send, grab, updating player 2 moves
 
         # drawing the board
         draw_board()

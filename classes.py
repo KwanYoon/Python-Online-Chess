@@ -30,14 +30,13 @@ class Square():
 class Network():
     def __init__(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server = "192.168.2.197"
+        self.server = socket.gethostbyname(socket.gethostname())
         self.port = 5555
         self.addr = (self.server, self.port)
-        self.board = self.connect()
-        print(self.board)
+        self.move = self.connect()
 
     def get_board(self):
-        return self.board
+        return self.move
 
     def connect(self):
         try:
@@ -49,15 +48,14 @@ class Network():
             pass
 
     # for sending to the server
-    def send(self, board):
+    def send(self, move):
         try:
             # send to the address
-            self.client.send(str.encode(board))
+            self.client.send(str.encode(move))
             # return what we receive after ending
             return self.client.recv(2048).decode()
         except socket.error as e:
             print(e)
 
-n = Network()
-print(n.send("information"))
-print(n.send("information2"))
+N = Network()
+N.send("this is a message")
