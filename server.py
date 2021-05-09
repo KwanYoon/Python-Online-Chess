@@ -1,5 +1,7 @@
 import socket
 from _thread import *
+from classes import Square
+import pickle
 
 # server settings
 server = socket.gethostbyname(socket.gethostname())
@@ -19,18 +21,31 @@ s.listen(2)
 print("Waiting for connection, server started")
 current_player = 0
 
+# board
+LIGHT_BROWN = (222, 184, 135)
+DARK_BROWN = (160, 82, 45)
+board = []
+for row in range(8):
+    board.append([])
+    for col in range(8):
+        # board square
+        if (row + col) % 2 == 1:
+            board[row].append(Square(row, col, LIGHT_BROWN, None, None))
+        else:
+            board[row].append(Square(row, col, DARK_BROWN, None, None))
+
 
 # threaded client function
 def client(conn, player):
     # continuously run when client connected
-    conn.send(str.encode("Connected"))
-    reply = ""
+    sending = [pickle.dumps(i) for i in board]
+    conn.send(sending)
     while True:
         # grab data
         try:
             # read and update player information
             data = conn.recv(2048)
-            reply = data.decode("utf-8")
+            reply = [pickle.loads(i) for i in data]
 
             # if no data received
             if not data:
@@ -42,7 +57,8 @@ def client(conn, player):
                 print("Sending: ", reply)
 
             # send to all connected
-            conn.sendall(str.encode(reply))
+            sending = [pickle.dumps(i) for i in board]
+            conn.sendall(sending)
 
         except:
             pass

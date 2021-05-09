@@ -1,6 +1,7 @@
 import pygame
 import os
 import socket
+import pickle
 
 # image imports
 SQUARE_WIDTH, SQUARE_HEIGHT = 100, 100
@@ -33,29 +34,29 @@ class Network():
         self.server = socket.gethostbyname(socket.gethostname())
         self.port = 5555
         self.addr = (self.server, self.port)
-        self.move = self.connect()
+        self.board = self.connect()
 
     def get_board(self):
-        return self.move
+        return self.board
 
     def connect(self):
         try:
             # connect to addr
             self.client.connect(self.addr)
             # return what we receive and decode it
-            return self.client.recv(2048).decode()
+            data = self.client.recv
+            return [pickle.loads(i) for i in data]
         except:
             pass
 
     # for sending to the server
-    def send(self, move):
+    def send(self, board):
         try:
             # send to the address
-            self.client.send(str.encode(move))
+            sending = [pickle.dumps(i) for i in board]
+            self.client.send(sending)
             # return what we receive after ending
-            return self.client.recv(2048).decode()
+            data = self.client.recv
+            return [pickle.loads(i) for i in data]
         except socket.error as e:
             print(e)
-
-N = Network()
-N.send("this is a message")

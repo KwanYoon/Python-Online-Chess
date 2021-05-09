@@ -405,6 +405,8 @@ def chess():
                         square.legal = True
 
         # send, grab, updating player 2 moves
+        global board
+        #board = n.send(board)
 
         # drawing the board
         draw_board()
