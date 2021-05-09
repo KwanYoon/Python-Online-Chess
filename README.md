@@ -7,7 +7,7 @@ Used **network programming** with **sockets** to implement online multiplayer fu
 
 ![online-chess-board](https://user-images.githubusercontent.com/47330978/117587836-db6ca400-b0ed-11eb-86ca-4c1d43ec96d0.png)
 
-***Being developed on PyCharm***
+## Being developed on PyCharm
 
 **Socket programming**
 
